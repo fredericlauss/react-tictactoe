@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState } from 'react';
 import Form from './Form';
+import Board from './Board';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
     <div className="App">
       <div>
       {showBoard ? (
-        <p>coucou game board</p>
+        <Board formData={formData} />
       ) : (
         <Form onFormSubmit={handleFormSubmit} />
       )}
