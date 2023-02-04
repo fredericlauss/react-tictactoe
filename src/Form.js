@@ -1,52 +1,56 @@
 import React, { useState } from 'react';
 
 const Form = ({ onFormSubmit }) => {
-  const [formData, setFormData] = useState({
-    firstPlayer: '',
-    boardSize: 0,
-    winningCondition: 0,
-    gameMode: '',
-  });
+  const [firstPlayer, setFirstPlayer] = useState('');
+  const [boardSize, setBoardSize] = useState(0);
+  const [winningCondition, setWinningCondition] = useState(0);
+  const [gameMode, setGameMode] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const formData = { firstPlayer, boardSize, winningCondition, gameMode };
     onFormSubmit(formData);
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        First Player:
-        <select name="firstPlayer" value={formData.firstPlayer} onChange={handleInputChange}>
+        First player:
+        <select value={firstPlayer} onChange={(event) => setFirstPlayer(event.target.value)}>
+          <option value="">Select a player</option>
           <option value="X">X</option>
           <option value="O">O</option>
         </select>
       </label>
+
       <br />
+
       <label>
-        Board Size:
-        <input type="number" name="boardSize" value={formData.boardSize} onChange={handleInputChange} />
+        Board size:
+        <input type="number" value={boardSize} onChange={(event) => setBoardSize(event.target.value)} />
       </label>
+
       <br />
+
       <label>
-        Winning Condition:
-        <input type="number" name="winningCondition" value={formData.winningCondition} onChange={handleInputChange} />
+        Winning condition:
+        <input type="number" value={winningCondition} onChange={(event) => setWinningCondition(event.target.value)} />
       </label>
+
       <br />
+
       <label>
-        Game Mode:
-        <select name="gameMode" value={formData.gameMode} onChange={handleInputChange}>
+        Game mode:
+        <select value={gameMode} onChange={(event) => setGameMode(event.target.value)}>
+          <option value="">Select a game mode</option>
           <option value="human">Human</option>
-          <option value="AI">AI</option>
+          <option value="minimax">Minimax</option>
         </select>
       </label>
+
       <br />
-      <button type="submit">Start Game</button>
+
+      <button type="submit">Start game</button>
     </form>
   );
 };

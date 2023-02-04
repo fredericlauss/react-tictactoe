@@ -1,10 +1,8 @@
-import './App.css';
 import React, { useState } from 'react';
 import Form from './Form';
 import Board from './Board';
 
 function App() {
-
   const [formData, setFormData] = useState({
     firstPlayer: '',
     boardSize: 0,
@@ -18,16 +16,13 @@ function App() {
     setShowBoard(true);
   };
 
-
   return (
     <div className="App">
-      <div>
       {showBoard ? (
         <Board formData={formData} />
       ) : (
         <Form onFormSubmit={handleFormSubmit} />
       )}
-    </div>
     </div>
   );
 }
