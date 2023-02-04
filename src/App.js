@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
 import Board from './Board';
+import './App.css';
 
 function App() {
   const [formData, setFormData] = useState({

@@ -8,10 +8,12 @@ const Board = ({ formData }) => {
   const [winner, setWinner] = useState(null);
 
   const handleCellClick = (rowIndex, colIndex) => {
-    const newGrid = [...grid];
-    newGrid[rowIndex][colIndex] = currentPlayer;
-    setGrid(newGrid);
-    setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+    if (grid[rowIndex][colIndex] === null) {
+      const newGrid = [...grid];
+      newGrid[rowIndex][colIndex] = currentPlayer;
+      setGrid(newGrid);
+      setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+    }
   };
 
   useEffect(() => {
@@ -47,13 +49,13 @@ const Board = ({ formData }) => {
       default:
         break;
     }
-
+  
     // Check if the current player wins
     winningCombinations.forEach(combination => {
       let isWinner = true;
       combination.forEach(cell => {
         const [row, col] = cell;
-        if (grid[row][col] !== currentPlayer) {
+        if (grid[row][col] !== currentPlayer || grid[row][col] === null) {
           isWinner = false;
         }
       });
@@ -61,7 +63,8 @@ const Board = ({ formData }) => {
         setWinner(currentPlayer);
       }
     });
-  }, [grid, currentPlayer, formData.winningCondition, formData.boardSize]);
+  }, [grid, currentPlayer, formData.winningCondition, formData.boardSize, winner]);
+  
 
   return (
     <div className="board">

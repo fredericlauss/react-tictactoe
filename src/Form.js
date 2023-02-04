@@ -8,9 +8,15 @@ const Form = ({ onFormSubmit }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const formData = { firstPlayer, boardSize, winningCondition, gameMode };
+    const formData = { 
+        firstPlayer, 
+        boardSize: parseInt(boardSize), 
+        winningCondition: parseInt(winningCondition), 
+        gameMode 
+    };
     onFormSubmit(formData);
   };
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -27,14 +33,14 @@ const Form = ({ onFormSubmit }) => {
 
       <label>
         Board size:
-        <input type="number" value={boardSize} onChange={(event) => setBoardSize(event.target.value)} />
+        <input type="number" value={boardSize} onChange={(event) => setBoardSize(event.target.value)} min="0" max="100" />
       </label>
 
       <br />
 
       <label>
         Winning condition:
-        <input type="number" value={winningCondition} onChange={(event) => setWinningCondition(event.target.value)} />
+        <input type="number" value={winningCondition} onChange={(event) => setWinningCondition(event.target.value)} min="0" max="100" />
       </label>
 
       <br />
