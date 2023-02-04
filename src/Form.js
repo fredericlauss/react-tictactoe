@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 
+
 const Form = ({ onFormSubmit }) => {
   const [firstPlayer, setFirstPlayer] = useState('');
   const [boardSize, setBoardSize] = useState(0);
   const [winningCondition, setWinningCondition] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
   const [gameMode, setGameMode] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const formData = { 
-        firstPlayer, 
-        boardSize: parseInt(boardSize), 
-        winningCondition: parseInt(winningCondition), 
-        gameMode 
-    };
-    onFormSubmit(formData);
+    if (winningCondition > boardSize) {
+      setErrorMessage('Winning condition cannot be greater than board size');
+    } else {
+      setErrorMessage('');
+      const formData = { 
+          firstPlayer, 
+          boardSize: parseInt(boardSize), 
+          winningCondition: parseInt(winningCondition), 
+          gameMode 
+      };
+      onFormSubmit(formData);
+    }
   };
 
 
@@ -55,7 +62,7 @@ const Form = ({ onFormSubmit }) => {
       </label>
 
       <br />
-
+      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
       <button type="submit">Start game</button>
     </form>
   );
