@@ -17,11 +17,19 @@ const Board = ({ formData }) => {
   const handleCellClick = (rowIndex, colIndex) => {
     if (!winner && grid[rowIndex][colIndex] === null) {
       if (formData.gameMode === "minimax") {
-        const bestMove = minimax(grid, currentPlayer, formData.boardSize, formData.winningCondition);
-        const [newRowIndex, newColIndex] = bestMove.index;
-        const newGrid = [...grid];
-        newGrid[newRowIndex][newColIndex] = currentPlayer;
-        setGrid(newGrid);
+        if (currentPlayer !== formData.firstPlayer) {
+          const bestMove = minimax(grid, 0, false).move;
+          const [newRowIndex, newColIndex] = bestMove;
+          const newGrid = [...grid];
+          newGrid[newRowIndex][newColIndex] = currentPlayer;
+          console.log(newGrid)
+          setGrid(newGrid);
+        } else {
+          const newGrid = [...grid];
+          newGrid[rowIndex][colIndex] = currentPlayer;
+          console.log(newGrid)
+          setGrid(newGrid);
+        }
       } else {
         const newGrid = [...grid];
         newGrid[rowIndex][colIndex] = currentPlayer;
@@ -33,8 +41,7 @@ const Board = ({ formData }) => {
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
   };
-  
-  
+
   const minimax = (grid, depth, isMaximizing) => {
     // Check if there is a winner or the game is a draw
     const winner = checkWinner();
@@ -75,7 +82,7 @@ const Board = ({ formData }) => {
       return { score: bestScore, move: bestMove };
     } else {
       let bestScore = Infinity;
-      let bestMove;
+      let bestMove = null;
       for (const move of moves) {
         // Make the move
         grid[move.row][move.col] = currentPlayer === 'X' ? 'O' : 'X';
@@ -89,9 +96,11 @@ const Board = ({ formData }) => {
           bestMove = move;
         }
       }
-      return { score: bestScore, move: bestMove };
+
+      return bestMove ? { score: bestScore, move: bestMove } : { score: bestScore };
     }
   };
+  
   
   
   const checkWinner = () => {
