@@ -16,16 +16,83 @@ const Board = ({ formData }) => {
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (!winner && grid[rowIndex][colIndex] === null) {
-      const newGrid = [...grid];
-      newGrid[rowIndex][colIndex] = currentPlayer;
-      setGrid(newGrid);
+      if (formData.gameMode === "minimax") {
+        const bestMove = minimax(grid, currentPlayer, formData.boardSize, formData.winningCondition);
+        const [newRowIndex, newColIndex] = bestMove.index;
+        const newGrid = [...grid];
+        newGrid[newRowIndex][newColIndex] = currentPlayer;
+        setGrid(newGrid);
+      } else {
+        const newGrid = [...grid];
+        newGrid[rowIndex][colIndex] = currentPlayer;
+        setGrid(newGrid);
+      }
       // Check for the winner after each move
       checkWinner();
       checkDraw();
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
   };
-
+  
+  
+  const minimax = (grid, depth, isMaximizing) => {
+    // Check if there is a winner or the game is a draw
+    const winner = checkWinner();
+    if (winner === 'X') {
+      return { score: -10 + depth };
+    } else if (winner === 'O') {
+      return { score: 10 - depth };
+    } else if (winner === 'Draw') {
+      return { score: 0 };
+    }
+  
+    // Generate all possible moves
+    const moves = [];
+    for (let i = 0; i < formData.boardSize; i++) {
+      for (let j = 0; j < formData.boardSize; j++) {
+        if (grid[i][j] === null) {
+          moves.push({ row: i, col: j });
+        }
+      }
+    }
+  
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+      let bestMove;
+      for (const move of moves) {
+        // Make the move
+        grid[move.row][move.col] = currentPlayer;
+        // Get the score for the move
+        const score = minimax(grid, depth + 1, false).score;
+        // Undo the move
+        grid[move.row][move.col] = null;
+        // Update bestScore and bestMove if a better score is found
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+      }
+      return { score: bestScore, move: bestMove };
+    } else {
+      let bestScore = Infinity;
+      let bestMove;
+      for (const move of moves) {
+        // Make the move
+        grid[move.row][move.col] = currentPlayer === 'X' ? 'O' : 'X';
+        // Get the score for the move
+        const score = minimax(grid, depth + 1, true).score;
+        // Undo the move
+        grid[move.row][move.col] = null;
+        // Update bestScore and bestMove if a better score is found
+        if (score < bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+      }
+      return { score: bestScore, move: bestMove };
+    }
+  };
+  
   
   const checkWinner = () => {
     const winningCombinations = [];
