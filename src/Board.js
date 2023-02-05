@@ -4,8 +4,15 @@ const Board = ({ formData }) => {
   const [grid, setGrid] = useState(
     Array(formData.boardSize).fill().map(() => Array(formData.boardSize).fill(null))
   );
-  const [currentPlayer, setCurrentPlayer] = useState(formData.firstPlayer === 'X' ? 'O' : 'X');
+  const [currentPlayer, setCurrentPlayer] = useState(formData.firstPlayer);
   const [winner, setWinner] = useState(null);
+
+  const checkDraw = () => {
+    if (grid.flat().every(cell => cell !== null) && !winner) {
+      setWinner('Draw');
+    }
+  };
+
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (!winner && grid[rowIndex][colIndex] === null) {
@@ -23,7 +30,7 @@ const Board = ({ formData }) => {
         const {row: newRowIndex, col: newColIndex} = bestMove.move;
         newGrid[newRowIndex][newColIndex] = currentPlayer === 'X' ? 'O' : 'X';
         setGrid(newGrid);
-        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+        setCurrentPlayer(currentPlayer === 'X' ? 'X' : 'O');
         console.log("Minimax");
       } else {
         const newGrid = [...grid];
@@ -32,6 +39,7 @@ const Board = ({ formData }) => {
         setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
       }
       checkWinner();
+      checkDraw();
     }
   };
   
@@ -46,7 +54,7 @@ const Board = ({ formData }) => {
     } else if (winner === 'Draw') {
       return { score: 0 };
     }
-
+  
     // Generate all possible moves
     const moves = [];
     for (let i = 0; i < formData.boardSize; i++) {
@@ -56,6 +64,11 @@ const Board = ({ formData }) => {
         }
       }
     }
+  
+    if (moves.length === 0) {
+      return { score: 0, move: null };
+    }
+  
     if (isMaximizing) {
       let bestScore = -Infinity;
       let bestMove = null;
@@ -87,12 +100,10 @@ const Board = ({ formData }) => {
           bestMove = move;
         }
       }
-      if (!bestMove) {
-        return { score: bestScore, move: null };
-      }
       return { score: bestScore, move: bestMove };
     }
   };
+  
   
   const checkWinner = () => {
     const winningCombinations = [];
