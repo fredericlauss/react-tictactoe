@@ -4,45 +4,39 @@ const Board = ({ formData }) => {
   const [grid, setGrid] = useState(
     Array(formData.boardSize).fill().map(() => Array(formData.boardSize).fill(null))
   );
-  const [currentPlayer, setCurrentPlayer] = useState(formData.firstPlayer);
+  const [currentPlayer, setCurrentPlayer] = useState(formData.firstPlayer === 'X' ? 'O' : 'X');
   const [winner, setWinner] = useState(null);
-  const [draw] = useState(0);
-
-  const checkDraw = () => {
-    if (grid.flat().every(cell => cell !== null) && !winner) {
-      setWinner('Draw');
-    }
-  };
 
   const handleCellClick = (rowIndex, colIndex) => {
     if (!winner && grid[rowIndex][colIndex] === null) {
       if (formData.gameMode === "minimax") {
-        if (currentPlayer !== formData.firstPlayer) {
-          const bestMove = minimax(grid, 0, false).move;
-          const [newRowIndex, newColIndex] = bestMove;
-          const newGrid = [...grid];
-          newGrid[newRowIndex][newColIndex] = currentPlayer;
-          console.log(newGrid)
-          setGrid(newGrid);
-        } else {
-          const newGrid = [...grid];
-          newGrid[rowIndex][colIndex] = currentPlayer;
-          console.log(newGrid)
-          setGrid(newGrid);
+        const newGrid = [...grid];
+        newGrid[rowIndex][colIndex] = currentPlayer;
+        setGrid(newGrid);
+        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+        const bestMove = minimax(newGrid, 0, false, currentPlayer === 'X' ? 'O' : 'X');
+        if (!bestMove.move) {
+          console.log("Minimax");
+          return;
         }
+        console.log(bestMove.move)
+        const {row: newRowIndex, col: newColIndex} = bestMove.move;
+        newGrid[newRowIndex][newColIndex] = currentPlayer === 'X' ? 'O' : 'X';
+        setGrid(newGrid);
+        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+        console.log("Minimax");
       } else {
         const newGrid = [...grid];
         newGrid[rowIndex][colIndex] = currentPlayer;
         setGrid(newGrid);
+        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
       }
-      // Check for the winner after each move
       checkWinner();
-      checkDraw();
-      setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
   };
+  
 
-  const minimax = (grid, depth, isMaximizing) => {
+  const minimax = (grid, depth, isMaximizing, player) => {
     // Check if there is a winner or the game is a draw
     const winner = checkWinner();
     if (winner === 'X') {
@@ -52,7 +46,7 @@ const Board = ({ formData }) => {
     } else if (winner === 'Draw') {
       return { score: 0 };
     }
-  
+
     // Generate all possible moves
     const moves = [];
     for (let i = 0; i < formData.boardSize; i++) {
@@ -62,17 +56,15 @@ const Board = ({ formData }) => {
         }
       }
     }
-  
     if (isMaximizing) {
       let bestScore = -Infinity;
-      let bestMove;
+      let bestMove = null;
       for (const move of moves) {
         // Make the move
-        grid[move.row][move.col] = currentPlayer;
+        const newGrid = grid.map(row => row.slice());
+        newGrid[move.row][move.col] = player;
         // Get the score for the move
-        const score = minimax(grid, depth + 1, false).score;
-        // Undo the move
-        grid[move.row][move.col] = null;
+        const score = minimax(newGrid, depth + 1, false, player === 'X' ? 'O' : 'X').score;
         // Update bestScore and bestMove if a better score is found
         if (score > bestScore) {
           bestScore = score;
@@ -85,23 +77,22 @@ const Board = ({ formData }) => {
       let bestMove = null;
       for (const move of moves) {
         // Make the move
-        grid[move.row][move.col] = currentPlayer === 'X' ? 'O' : 'X';
+        const newGrid = grid.map(row => row.slice());
+        newGrid[move.row][move.col] = player === 'X' ? 'O' : 'X';
         // Get the score for the move
-        const score = minimax(grid, depth + 1, true).score;
-        // Undo the move
-        grid[move.row][move.col] = null;
+        const score = minimax(newGrid, depth + 1, true, player).score;
         // Update bestScore and bestMove if a better score is found
         if (score < bestScore) {
           bestScore = score;
           bestMove = move;
         }
       }
-
-      return bestMove ? { score: bestScore, move: bestMove } : { score: bestScore };
+      if (!bestMove) {
+        return { score: bestScore, move: null };
+      }
+      return { score: bestScore, move: bestMove };
     }
   };
-  
-  
   
   const checkWinner = () => {
     const winningCombinations = [];
