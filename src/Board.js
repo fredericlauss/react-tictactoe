@@ -178,7 +178,7 @@ const Board = ({ formData }) => {
           ))}
         </div>
       ))}
-      {winner && winner != 'Draw' &&<div className="winner-message">{winner} wins!</div>}
+      {winner && winner !== 'Draw' &&<div className="winner-message">{winner} wins!</div>}
       {winner === 'Draw' && <div className="winner-message">It's a draw!</div>}
 
     </div>
